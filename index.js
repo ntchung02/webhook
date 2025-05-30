@@ -21,8 +21,8 @@ app.post("/create-payment", async (req, res) => {
   const { orderId, amount, orderInfo } = req.body;
 
   const requestId = orderId.toString();
-  const redirectUrl = "https://yourdomain.com/return";
-  const ipnUrl = "https://your-node-server.onrender.com/ipn";
+  const redirectUrl = `https://loptamlyhoc.com/checkout/order-received/${orderId}/?key=${orderKey}`;
+  const ipnUrl = "https://webhook-hi7l.onrender.com/ipn";
   const extraData = "";
 
   const rawSignature = `accessKey=${MOMO_ACCESS_KEY}&amount=${amount}&extraData=${extraData}&ipnUrl=${ipnUrl}&orderId=${orderId}&orderInfo=${orderInfo}&partnerCode=${MOMO_PARTNER_CODE}&redirectUrl=${redirectUrl}&requestId=${requestId}&requestType=captureWallet`;
