@@ -1,56 +1,41 @@
-<?php
-// Cấu hình
-$endpoint = "https://test-payment.momo.vn/v2/gateway/api/create";
-$partnerCode = "MOMORKPA20240709_TEST";
-$accessKey = "mjHEUVjfCewyaKbP";
-$secretKey = "VCDbXlkfG8ag4aDxddNV4V66egEAb0Hz";
+const express = require("express");
+const crypto = require("crypto");
 
-// Lấy dữ liệu từ WooCommerce (hoặc test tạm)
-$orderId = time() . "";
-$requestId = time() . "";
-$orderInfo = "Thanh toán đơn hàng #" . $orderId;
-$amount = "1000"; // số tiền tạm test
-$redirectUrl = "https://yourdomain.com/return";
-$ipnUrl = "https://yourdomain.com/notify";
-$extraData = "";
+const app = express();
+app.use(express.json()); // Parse application/json
 
-// Tạo chữ ký
-$rawHash = "accessKey=" . $accessKey .
-    "&amount=" . $amount .
-    "&extraData=" . $extraData .
-    "&ipnUrl=" . $ipnUrl .
-    "&orderId=" . $orderId .
-    "&orderInfo=" . $orderInfo .
-    "&partnerCode=" . $partnerCode .
-    "&redirectUrl=" . $redirectUrl .
-    "&requestId=" . $requestId .
-    "&requestType=captureWallet";
+// Momo credentials
+const accessKey = "mjHEUVjfCewyaKbP";
+const secretKey = "VCDbXIkfG8ag4aDxddNV4V66egEAb0Hz";
+const partnerCode = "MOMORKPA20240709_TEST";
 
-$signature = hash_hmac("sha256", $rawHash, $secretKey);
+// Webhook route
+app.post("/webhook", (req, res) => {
+  const data = req.body;
+  const signature = data.signature;
+  delete data.signature;
 
-// Gửi dữ liệu đến Momo
-$data = array(
-    'partnerCode' => $partnerCode,
-    'accessKey' => $accessKey,
-    'requestId' => $requestId,
-    'amount' => $amount,
-    'orderId' => $orderId,
-    'orderInfo' => $orderInfo,
-    'redirectUrl' => $redirectUrl,
-    'ipnUrl' => $ipnUrl,
-    'extraData' => $extraData,
-    'requestType' => "captureWallet",
-    'signature' => $signature,
-    'lang' => 'vi'
-);
+  // Sort keys
+  const sortedKeys = Object.keys(data).sort();
+  const rawData = sortedKeys.map(key => `${key}=${data[key]}`).join("&");
 
-$ch = curl_init($endpoint);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
-$result = curl_exec($ch);
-curl_close($ch);
+  const generatedSignature = crypto
+    .createHmac("sha256", secretKey)
+    .update(rawData)
+    .digest("hex");
 
-// Trả kết quả
-header('Content-Type: application/json');
-echo $result;
+  if (signature === generatedSignature) {
+    console.log("✅ Webhook hợp lệ:", data);
+    res.status(200).json({ message: "OK" });
+  } else {
+    console.log("❌ Sai chữ ký:", signature);
+    res.status(400).json({ message: "Invalid signature" });
+  }
+});
+
+app.get("/", (req, res) => res.send("Webhook đang hoạt động."));
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server đang chạy tại http://localhost:${PORT}`);
+});
