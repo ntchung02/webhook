@@ -57,3 +57,8 @@ app.post('/relay-momo/ipn', async (req, res) => {
   }
 });
 
+app.get('/wake-up', (req, res) => {
+  const time = new Date().toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' });
+  console.log(`👋 Wake-up ping received at ${time} from IP: ${req.ip}`);
+  res.send(`✅ Hello! Server đã được ping lúc ${time}`);
+});
