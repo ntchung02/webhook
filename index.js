@@ -86,3 +86,19 @@ app.post('/relay-momo/v2/gateway/api/create', async (req, res) => {
     });
   }
 });
+
+app.post('/relay-momo/ipn', async (req, res) => {
+  try {
+    const momoData = req.body;
+
+    const response = await axios.post(
+      'https://loptamlyhoc.com/?wc-api=momo_ipn',
+      momoData,
+      { headers: { 'Content-Type': 'application/json' } }
+    );
+
+    res.json({ success: true, message: 'IPN forwarded to WooCommerce', detail: response.data });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
