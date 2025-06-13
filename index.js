@@ -38,4 +38,21 @@ app.post('/relay-momo/v2/gateway/api/create', async (req, res) => {
   }
 });
 
+app.post('/relay-momo/ipn', async (req, res) => {
+  try {
+    const momoData = req.body;
+
+    // Gửi về đúng địa chỉ WooCommerce
+    const response = await axios.post(
+      'https://loptamlyhoc.com/?wc-api=momo_ipn',
+      momoData,
+      { headers: { 'Content-Type': 'application/json' } }
+    );
+
+    res.json({ success: true, message: 'IPN forwarded', detail: response.data });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
 
