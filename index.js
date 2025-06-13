@@ -1,26 +1,27 @@
-// server.js
 const express = require('express');
 const axios = require('axios');
 const app = express();
-
 app.use(express.json());
 
-const TARGET_ENDPOINT = 'https://test-payment.momo.vn/v2/gateway/api/create'; // nơi bạn muốn nhận dữ liệu
+const MOMO_CREATE_URL = 'https://test-payment.momo.vn/v2/gateway/api/create';
 
-app.post('/momo-relay', async (req, res) => {
+app.post('/create-order', async (req, res) => {
   try {
-    const response = await axios.post(TARGET_ENDPOINT, req.body, {
-      headers: { 'Content-Type': 'application/json' }
+    const response = await axios.post(MOMO_CREATE_URL, req.body, {
+      headers: { 'Content-Type': 'application/json' },
     });
-
-    res.status(response.status).send({
-      message: 'Đã relay thành công',
-      momoResponse: response.data
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).send({ message: 'Relay thất bại', error: error.message });
+    res.json(response.data); // Gửi lại kết quả MoMo trả về
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ error: 'Relay error', detail: err.message });
   }
 });
 
-app.listen(3000, () => console.log('Relay server đang chạy tại http://localhost:3000'));
+app.get('/', (req, res) => {
+  res.send('✅ Relay Server is running');
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`✅ Server running at port ${PORT}`);
+});
