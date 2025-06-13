@@ -15,9 +15,13 @@ app.listen(PORT, () => {
 
 // /relay-momo/v2/gateway/api/create
 app.post('/relay-momo/v2/gateway/api/create', async (req, res) => {
-  try {
-    const axios = require('axios');
+  const axios = require('axios');
+  const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
 
+  console.log(`[${new Date().toISOString()}] [INCOMING REQUEST] From IP: ${clientIp}`);
+  console.log(`[REQUEST BODY]`, req.body);
+
+  try {
     const response = await axios.post(
       'https://payment.momo.vn/v2/gateway/api/create',
       req.body,
@@ -29,15 +33,17 @@ app.post('/relay-momo/v2/gateway/api/create', async (req, res) => {
       }
     );
 
+    console.log(`[${new Date().toISOString()}] [SUCCESS] Momo API responded with status ${response.status}`);
     res.json(response.data);
   } catch (err) {
-    console.error(err);
+    console.error(`[${new Date().toISOString()}] [ERROR]`, err.message);
     res.status(500).json({
       success: false,
       message: err.message || 'Relay error'
     });
   }
 });
+
 
 app.post('/relay-momo/ipn', async (req, res) => {
   try {
