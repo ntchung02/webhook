@@ -61,3 +61,28 @@ app.post('/test', async (req, res) => {
   }
 });
 
+// /relay-momo/v2/gateway/api/create
+app.post('/relay-momo/v2/gateway/api/create', async (req, res) => {
+  try {
+    const axios = require('axios');
+
+    const response = await axios.post(
+      'https://test-payment.momo.vn/v2/gateway/api/create',
+      req.body,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        timeout: 10000
+      }
+    );
+
+    res.json(response.data);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      success: false,
+      message: err.message || 'Relay error'
+    });
+  }
+});
