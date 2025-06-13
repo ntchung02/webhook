@@ -67,7 +67,7 @@ app.post('/relay-momo/v2/gateway/api/create', async (req, res) => {
     const axios = require('axios');
 
     const response = await axios.post(
-      'https://payment.momo.vn/v2/gateway/api/create',
+      'https://test-payment.momo.vn/v2/gateway/api/create',
       req.body,
       {
         headers: {
