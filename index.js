@@ -44,7 +44,7 @@ app.post('/test', async (req, res) => {
       signature: "signature-test" // Dùng tạm hoặc tạo đúng nếu cần
     };
 
-    const response = await axios.post('https://test-payment.momo.vn/v2/gateway/api/create', payload, {
+    const response = await axios.post('https://payment.momo.vn/v2/gateway/api/create', payload, {
       headers: { 'Content-Type': 'application/json' }
     });
 
