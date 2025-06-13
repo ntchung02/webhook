@@ -25,3 +25,14 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`✅ Server running at port ${PORT}`);
 });
+
+
+app.post('/test', async (req, res) => {
+  try {
+    // Gửi request thật đến MoMo server
+    const response = await axios.head('https://test-payment.momo.vn', { timeout: 10000 });
+    res.status(200).json({ success: true, momo_status: response.status });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
