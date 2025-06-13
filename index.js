@@ -4,6 +4,7 @@ const app = express();
 app.use(express.json());
 
 app.get('/', (req, res) => {
+  console.log('👋 Hi, chào bạn! Có người vừa ping tới server.');
   res.send('✅ Relay Server is running');
 });
 
