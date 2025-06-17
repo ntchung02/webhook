@@ -19,7 +19,9 @@ app.post('/relay-momo/v2/gateway/api/create', async (req, res) => {
   const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
 
   console.log(`[${new Date().toISOString()}] [INCOMING REQUEST] From IP: ${clientIp}`);
-  console.log(`[REQUEST BODY]`, req.body);
+
+  const { amount, orderId, orderInfo } = req.body;
+  console.log(`[REQUEST BODY] amount: ${amount}, orderId: ${orderId}, orderInfo: ${orderInfo}`);
 
   try {
     const response = await axios.post(
@@ -43,6 +45,7 @@ app.post('/relay-momo/v2/gateway/api/create', async (req, res) => {
     });
   }
 });
+
 
 
 app.post('/relay-momo/ipn', async (req, res) => {
