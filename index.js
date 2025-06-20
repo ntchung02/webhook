@@ -3,6 +3,8 @@ const axios = require('axios');
 const app = express();
 app.use(express.json());
 
+let wakeUpLogs = [];
+
 app.get('/', (req, res) => {
   console.log('👋 Hi, chào bạn! Có người vừa ping tới server.');
   res.send('✅ Relay Server is running');
@@ -68,6 +70,21 @@ app.post('/relay-momo/ipn', async (req, res) => {
 
 app.get('/wake-up', (req, res) => {
   const time = new Date().toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' });
-  console.log(`👋 Wake-up ping received at ${time} from IP: ${req.ip}`);
-  res.send(`✅ Hello! Server đã được ping lúc ${time}`);
+  const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+
+  const logEntry = {
+    pingTime: new Date(),
+    status: 'Wake-up called',
+    log: `Wake-up ping từ IP: ${ip} lúc ${time}`,
+  };
+
+  wakeUpLogs.unshift(logEntry); // Lưu log mới nhất lên đầu
+  console.log(`✅ ${logEntry.log}`);
+
+  res.send(`✅ Hello! ${logEntry.log}`);
+});
+
+// API cho React lấy log
+app.get('/api/monitor', (req, res) => {
+  res.json(wakeUpLogs);
 });
